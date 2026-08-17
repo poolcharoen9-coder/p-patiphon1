@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>p_patiphon — ร้านค้าของนักเรียน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;600;700;800&family=Sarabun:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF7EC;
+    --dots: rgba(10,10,10,.08);
+    --ink:#0B0B0F;
+    --ink-soft:#54525E;
+    --violet:#6C5CE7;
+    --violet-deep:#5241D6;
+    --pink:#FF3D7A;
+    --yellow:#FFD93D;
+    --mint:#00D9A3;
+    --white:#FFFFFF;
+    --radius:18px;
+    --border:3px solid var(--ink);
+    --shadow:6px 6px 0 var(--ink);
+    --shadow-sm:4px 4px 0 var(--ink);
+    --display:'Prompt', sans-serif;
+    --body:'Sarabun', sans-serif;
+    --mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+  body{
+    margin:0;
+    background:
+      radial-gradient(var(--dots) 1.6px, transparent 1.6px);
+    background-size:22px 22px;
+    background-color:var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.55;
+    padding-bottom:60px;
+  }
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--violet); outline-offset:2px;}
+
+  header.top{
+    background:var(--bg);
+    border-bottom:var(--border);
+    position:sticky; top:0; z-index:50;
+  }
+  .topbar{
+    max-width:1160px; margin:0 auto; padding:16px 24px 10px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--display); font-weight:800; font-size:1.5rem; color:var(--ink);
+    text-decoration:none;
+  }
+  .brand .badge{
+    background:var(--yellow); border:2.5px solid var(--ink); border-radius:8px;
+    padding:2px 9px; font-size:1.2rem; transform:rotate(-6deg); display:inline-block;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .member-pill{
+    font-family:var(--mono); font-weight:700; font-size:.78rem; background:var(--mint);
+    color:var(--ink); padding:6px 14px; border:2.5px solid var(--ink); border-radius:999px;
+    display:none; align-items:center; gap:6px; box-shadow:3px 3px 0 var(--ink); transform:rotate(-2deg);
+  }
+  .member-pill.show{display:inline-flex;}
+
+  nav.tabs{
+    max-width:1160px; margin:0 auto; padding:0 24px 16px;
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .tab-btn{
+    font-family:var(--display); font-weight:700; font-size:.9rem;
+    background:var(--white); color:var(--ink);
+    border:2.5px solid var(--ink);
+    padding:9px 16px; border-radius:10px;
+    cursor:pointer; position:relative; box-shadow:3px 3px 0 var(--ink);
+    transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+  }
+  .tab-btn:hover{transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ink);}
+  .tab-btn.active{background:var(--violet); color:var(--white);}
+  .cart-badge{
+    font-family:var(--mono); background:var(--pink); color:var(--white); border:2px solid var(--ink);
+    font-size:.68rem; padding:1px 6px; border-radius:999px; margin-left:6px;
+  }
+
+  main{max-width:1160px; margin:0 auto; padding:0 24px;}
+  .page{display:none; animation:fadeIn .25s ease;}
+  .page.active{display:block;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .card{
+    background:var(--white); border:var(--border); border-radius:var(--radius); box-shadow:var(--shadow);
+  }
+
+  /* sticker tape */
+  .tape{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%) rotate(-3deg);
+    width:90px; height:26px; background:rgba(255,217,61,.85); border:2px solid var(--ink);
+  }
+
+  /* HOME: BENTO */
+  .bento{
+    display:grid; grid-template-columns:repeat(6,1fr); gap:18px; padding:40px 0 30px;
+  }
+  .cell-hero{grid-column:span 4; padding:36px; position:relative; display:flex; flex-direction:column; justify-content:center;}
+  .cell-hero .eyebrow{
+    font-family:var(--mono); font-weight:700; font-size:.78rem; letter-spacing:.04em; text-transform:uppercase;
+    background:var(--ink); color:var(--white); padding:5px 12px; border-radius:6px; display:inline-block; width:fit-content;
+  }
+  .cell-hero h1{
+    font-family:var(--display); font-weight:800; font-size:clamp(2rem,3.6vw,2.9rem); line-height:1.1; margin:16px 0 12px;
+  }
+  .cell-hero h1 span.hl{
+    background:var(--pink); color:var(--white); padding:2px 10px; display:inline-block; transform:rotate(-1.5deg); border-radius:6px;
+  }
+  .cell-hero p{color:var(--ink-soft); font-size:1.02rem; max-width:44ch; margin:0 0 20px;}
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap;}
+  .btn{
+    font-family:var(--display); font-weight:700; font-size:.92rem; border-radius:10px; border:2.5px solid var(--ink);
+    padding:12px 20px; cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
+    box-shadow:var(--shadow-sm); background:var(--white); color:var(--ink);
+  }
+  .btn:hover{transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink);}
+  .btn:active{transform:translate(0,0); box-shadow:2px 2px 0 var(--ink);}
+  .btn-violet{background:var(--violet); color:var(--white);}
+  .btn-pink{background:var(--pink); color:var(--white);}
+  .btn-mint{background:var(--mint); color:var(--ink);}
+  .btn-yellow{background:var(--yellow); color:var(--ink);}
+  .btn-sm{padding:7px 14px; font-size:.8rem;}
+
+  .cell-receipt{grid-column:span 2; padding:22px 20px 18px; position:relative; transform:rotate(2deg); font-family:var(--mono); font-size:.84rem;}
+  .cell-receipt .rtitle{font-family:var(--display); font-weight:700; font-size:.98rem; margin-bottom:10px; display:flex; justify-content:space-between;}
+  .cell-receipt .rline{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1.5px dashed var(--ink);}
+  .cell-receipt .rtotal{font-weight:800; border-bottom:none; border-top:2px solid var(--ink); margin-top:4px; padding-top:10px;}
+
+  .cell-stat{grid-column:span 2; padding:20px; display:flex; flex-direction:column; justify-content:center; gap:4px; background:var(--yellow);}
+  .cell-stat .num{font-family:var(--display); font-weight:800; font-size:2.1rem; line-height:1;}
+  .cell-stat .lbl{font-family:var(--mono); font-size:.75rem; color:var(--ink);}
+
+  .cell-cats{grid-column:span 4; padding:20px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;}
+  .cell-cats .lbl-head{font-family:var(--display); font-weight:700; font-size:.95rem; width:100%; margin-bottom:4px;}
+  .sticker-cat{
+    display:flex; align-items:center; gap:8px; background:var(--white); border:2.5px solid var(--ink); border-radius:999px;
+    padding:8px 14px 8px 10px; cursor:pointer; font-family:var(--display); font-weight:600; font-size:.85rem;
+    box-shadow:3px 3px 0 var(--ink); transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .sticker-cat:nth-child(odd){transform:rotate(-2deg);}
+  .sticker-cat:nth-child(even){transform:rotate(2deg);}
+  .sticker-cat:hover{transform:translateY(-3px) rotate(0deg); box-shadow:5px 5px 0 var(--ink);}
+  .sticker-cat .ic{font-size:1.15rem;}
+
+  .section-head{margin:52px 0 22px; display:flex; align-items:center; gap:14px;}
+  .section-head .num-badge{
+    font-family:var(--mono); font-weight:800; background:var(--ink); color:var(--white);
+    border-radius:8px; padding:4px 10px; font-size:.85rem; transform:rotate(-4deg);
+  }
+  .section-head h2{font-family:var(--display); font-weight:700; font-size:1.5rem; margin:0;}
+
+  .feat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;}
+
+  /* PRODUCT CARD */
+  .product{
+    background:var(--white); border:var(--border); border-radius:14px;
+    padding:16px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-sm);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .product:hover{transform:translate(-3px,-3px); box-shadow:7px 7px 0 var(--ink);}
+  .product .ic{
+    font-size:2.1rem; background:var(--bg); border:2px solid var(--ink); border-radius:10px; height:80px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .product .nm{font-family:var(--display); font-weight:600; font-size:.96rem; min-height:2.4em;}
+  .product .tag{font-family:var(--mono); font-size:.66rem; color:var(--ink-soft); text-transform:uppercase; font-weight:700;}
+  .product .price-row{display:flex; align-items:center; justify-content:space-between; margin-top:auto;}
+  .product .price{font-family:var(--mono); font-weight:800; font-size:1.05rem; background:var(--yellow); padding:2px 8px; border:2px solid var(--ink); border-radius:6px;}
+  .add-btn{
+    font-family:var(--mono); font-weight:700; font-size:.76rem; background:var(--ink); color:var(--white);
+    border:2px solid var(--ink); border-radius:8px; padding:8px 12px; cursor:pointer; transition:background .15s ease, transform .12s ease;
+  }
+  .add-btn:hover{background:var(--violet); transform:translateY(-1px);}
+  .add-btn.added{background:var(--mint); color:var(--ink);}
+
+  /* PRODUCTS PAGE */
+  .cat-select-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin:22px 0 40px;}
+  .cat-select-card{
+    background:var(--white); border:var(--border); border-radius:16px; padding:30px 20px; text-align:center;
+    cursor:pointer; box-shadow:var(--shadow-sm); transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .cat-select-card:nth-child(3n+1){transform:rotate(-1deg);}
+  .cat-select-card:nth-child(3n+2){transform:rotate(0.5deg);}
+  .cat-select-card:nth-child(3n){transform:rotate(-0.5deg);}
+  .cat-select-card:hover{transform:translate(-3px,-3px) rotate(0deg); box-shadow:7px 7px 0 var(--ink);}
+  .cat-select-card .ic{font-size:2.6rem; display:block; margin-bottom:12px;}
+  .cat-select-card .nm{font-family:var(--display); font-weight:700; font-size:1.05rem;}
+  .cat-select-card .cnt{font-family:var(--mono); font-size:.72rem; color:var(--ink-soft); margin-top:8px; background:var(--bg); border:1.5px solid var(--ink); display:inline-block; padding:2px 10px; border-radius:999px;}
+  .cat-select-card.all-card{background:var(--yellow);}
+  #backToCatsBtn{background:var(--white);}
+  .product-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; padding-bottom:16px;}
+
+  /* FORMS */
+  .form-wrap{
+    max-width:560px; margin:36px auto; background:var(--white); border:var(--border);
+    border-radius:var(--radius); padding:32px; box-shadow:var(--shadow); position:relative;
+  }
+  .form-wrap h2{font-family:var(--display); font-weight:700; margin-top:6px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-family:var(--display); font-weight:600; font-size:.85rem; margin-bottom:6px; color:var(--ink);}
+  .field input, .field select, .field textarea{
+    width:100%; padding:11px 12px; border:2.5px solid var(--ink); border-radius:10px;
+    font-family:var(--body); font-size:.95rem; background:var(--bg); color:var(--ink);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--violet); outline:none;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .hint{font-family:var(--mono); font-size:.72rem; color:var(--ink-soft); margin-top:4px;}
+  .success-box{
+    display:none; background:var(--mint); border:2.5px solid var(--ink);
+    color:var(--ink); font-family:var(--mono); font-weight:700; font-size:.85rem; padding:12px 14px; border-radius:10px; margin-bottom:16px;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .success-box.show{display:block;}
+
+  /* ORDER SUMMARY */
+  .order-layout{display:grid; grid-template-columns:1.6fr 1fr; gap:26px; margin:30px 0 50px; align-items:start;}
+  .cart-table{width:100%; border-collapse:collapse; background:var(--white); border:var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow);}
+  .cart-table th{
+    font-family:var(--mono); font-size:.72rem; text-transform:uppercase; text-align:left; font-weight:800;
+    background:var(--ink); padding:12px 14px; color:var(--white);
+  }
+  .cart-table td{padding:14px; border-top:2px solid var(--ink); vertical-align:middle;}
+  .cart-item-name{font-family:var(--display); font-weight:600; font-size:.92rem; display:flex; align-items:center; gap:10px;}
+  .cart-item-name .ic{font-size:1.3rem;}
+  .qty-ctrl{display:flex; align-items:center; gap:8px;}
+  .qty-ctrl button{
+    width:26px; height:26px; border-radius:6px; border:2px solid var(--ink); background:var(--bg);
+    cursor:pointer; font-family:var(--mono); font-weight:800;
+  }
+  .qty-ctrl span{font-family:var(--mono); min-width:18px; text-align:center; display:inline-block; font-weight:700;}
+  .remove-link{font-family:var(--mono); font-weight:700; font-size:.72rem; color:var(--pink); background:none; border:none; cursor:pointer; text-decoration:underline; padding:0;}
+  .empty-cart{padding:40px 20px; text-align:center; color:var(--ink-soft); font-family:var(--body);}
+
+  .summary-card{
+    background:var(--yellow); border:var(--border); border-radius:var(--radius); padding:22px;
+    font-family:var(--mono); font-size:.88rem; box-shadow:var(--shadow);
+  }
+  .summary-card h3{font-family:var(--display); font-weight:700; font-size:1.1rem; margin-top:0;}
+  .sum-row{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1.5px dashed var(--ink);}
+  .sum-row.total{border-bottom:none; border-top:2.5px solid var(--ink); margin-top:4px; padding-top:12px; font-weight:800; font-size:1rem;}
+  .summary-card .btn{width:100%; margin-top:16px; background:var(--ink); color:var(--white);}
+
+  /* SHIPPING */
+  .ship-layout{display:grid; grid-template-columns:1.3fr 1fr; gap:26px; margin:30px 0 50px; align-items:start;}
+  .ship-options{display:flex; flex-direction:column; gap:12px;}
+  .ship-option{
+    background:var(--white); border:2.5px solid var(--ink); border-radius:14px; padding:16px 18px;
+    display:flex; justify-content:space-between; align-items:center; cursor:pointer; gap:12px;
+    box-shadow:3px 3px 0 var(--ink); transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .ship-option:hover{transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ink);}
+  .ship-option.selected{background:var(--mint);}
+  .ship-option .left{display:flex; gap:12px; align-items:flex-start;}
+  .ship-option .ic{font-size:1.5rem;}
+  .ship-option .nm{font-family:var(--display); font-weight:700; font-size:.95rem;}
+  .ship-option .desc{font-family:var(--body); font-size:.82rem; color:var(--ink-soft);}
+  .ship-option .price{font-family:var(--mono); font-weight:800; white-space:nowrap;}
+  .radio-dot{width:18px; height:18px; border-radius:50%; border:2.5px solid var(--ink); flex:0 0 auto; margin-top:2px; position:relative; background:var(--white);}
+  .ship-option.selected .radio-dot::after{content:""; position:absolute; inset:3px; background:var(--ink); border-radius:50%;}
+
+  .confirm-box{display:none; background:var(--mint); border:var(--border); border-radius:var(--radius); padding:20px; margin-top:20px; font-family:var(--mono); font-size:.85rem; box-shadow:var(--shadow);}
+  .confirm-box.show{display:block;}
+  .confirm-box .ok-title{font-family:var(--display); font-weight:700; color:var(--ink); font-size:1.05rem; margin-bottom:8px;}
+
+  footer{max-width:1160px; margin:70px auto 0; padding:24px; border-top:var(--border); font-family:var(--mono); font-size:.75rem; color:var(--ink-soft); text-align:center;}
+
+  @media (max-width:900px){
+    .bento{grid-template-columns:repeat(2,1fr);}
+    .cell-hero, .cell-receipt, .cell-stat, .cell-cats{grid-column:span 2;}
+    .feat-grid, .product-grid{grid-template-columns:repeat(2,1fr);}
+    .order-layout, .ship-layout{grid-template-columns:1fr;}
+    .field-row{grid-template-columns:1fr;}
+  }
+  @media (max-width:480px){
+    .feat-grid, .product-grid{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topbar">
+    <a class="brand" href="#" onclick="return false;"><span class="badge">📎</span>p_patiphon</a>
+    <span class="member-pill" id="memberPill">🎓 <span id="memberName"></span></span>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="เมนูหลัก">
+    <button class="tab-btn active" data-page="home" role="tab">หน้าหลัก</button>
+    <button class="tab-btn" data-page="register" role="tab">สมัครสมาชิก</button>
+    <button class="tab-btn" data-page="products" role="tab">สินค้า</button>
+    <button class="tab-btn" data-page="order" role="tab">สรุปคำสั่งซื้อ<span class="cart-badge" id="cartBadge">0</span></button>
+    <button class="tab-btn" data-page="shipping" role="tab">การจัดส่ง</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- 1. HOME -->
+  <section class="page active" id="home">
+    <div class="bento">
+      <div class="cell-hero card">
+        <span class="eyebrow">ร้านค้าออนไลน์เพื่อนักเรียน</span>
+        <h1>ของที่นักเรียน<span class="hl">ต้องใช้จริง</span> ในที่เดียว</h1>
+        <p>เครื่องเขียน หนังสือ เครื่องแบบ ของว่าง ไปจนถึงอุปกรณ์ไอที เลือกซื้อง่าย จ่ายเร็ว จัดส่งถึงโรงเรียนหรือถึงบ้าน</p>
+        <div class="cta-row">
+          <button class="btn btn-violet" data-goto="products">เลือกซื้อสินค้า</button>
+          <button class="btn btn-yellow" data-goto="register">สมัครสมาชิกฟรี</button>
+        </div>
+      </div>
+      <div class="cell-receipt card">
+        <div class="tape"></div>
+        <div class="rtitle"><span>ใบเสร็จ</span><span style="font-size:.68rem; font-weight:400;">#DM-0417</span></div>
+        <div class="rline"><span>สมุดโน้ต A5</span><span>45.-</span></div>
+        <div class="rline"><span>ปากกา x3</span><span>35.-</span></div>
+        <div class="rline"><span>เสื้อนักเรียน M</span><span>190.-</span></div>
+        <div class="rline"><span>ส่งด่วน</span><span>40.-</span></div>
+        <div class="rline rtotal"><span>รวม</span><span>310.-</span></div>
+      </div>
+      <div class="cell-stat card">
+        <div class="num">17+</div>
+        <div class="lbl">รายการสินค้าพร้อมส่ง</div>
+      </div>
+      <div class="cell-cats card" id="homeCats">
+        <div class="lbl-head">🛍️ หมวดหมู่ยอดนิยม — แตะเพื่อเลือกซื้อ</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <span class="num-badge">02</span>
+      <h2>สินค้าแนะนำประจำสัปดาห์</h2>
+    </div>
+    <div class="feat-grid" id="featuredGrid"></div>
+  </section>
+
+  <!-- 2. REGISTER -->
+  <section class="page" id="register">
+    <div class="form-wrap">
+      <div class="tape"></div>
+      <h2>สมัครสมาชิก</h2>
+      <p class="hint" style="margin-bottom:18px;">สมัครฟรี ใช้อีเมลโรงเรียนหรืออีเมลส่วนตัวก็ได้</p>
+      <div class="success-box" id="regSuccess">✓ สมัครสมาชิกสำเร็จ! ยินดีต้อนรับสู่ p_patiphon</div>
+      <form id="registerForm">
+        <div class="field-row">
+          <div class="field">
+            <label for="fname">ชื่อ</label>
+            <input type="text" id="fname" required placeholder="เช่น สมชาย">
+          </div>
+          <div class="field">
+            <label for="lname">นามสกุล</label>
+            <input type="text" id="lname" required placeholder="เช่น ใจดี">
+          </div>
+        </div>
+        <div class="field">
+          <label for="grade">ระดับชั้น</label>
+          <select id="grade" required>
+            <option value="">-- เลือกระดับชั้น --</option>
+            <option>มัธยมศึกษาปีที่ 1</option>
+            <option>มัธยมศึกษาปีที่ 2</option>
+            <option>มัธยมศึกษาปีที่ 3</option>
+            <option>มัธยมศึกษาปีที่ 4</option>
+            <option>มัธยมศึกษาปีที่ 5</option>
+            <option>มัธยมศึกษาปีที่ 6</option>
+            <option>ปวช. / ปวส.</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="email">อีเมล</label>
+          <input type="email" id="email" required placeholder="you@example.com">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="pw1">รหัสผ่าน</label>
+            <input type="password" id="pw1" required minlength="6" placeholder="อย่างน้อย 6 ตัวอักษร">
+          </div>
+          <div class="field">
+            <label for="pw2">ยืนยันรหัสผ่าน</label>
+            <input type="password" id="pw2" required minlength="6">
+          </div>
+        </div>
+        <p class="hint" id="pwHint"></p>
+        <button type="submit" class="btn btn-mint" style="width:100%; margin-top:8px;">สมัครสมาชิก</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 3. PRODUCTS -->
+  <section class="page" id="products">
+    <div class="section-head" style="margin-top:36px;">
+      <span class="num-badge">03</span>
+      <h2 id="productsHeading">เลือกหมวดหมู่ที่ต้องการดูสินค้า</h2>
+    </div>
+
+    <div id="categoryView">
+      <div class="cat-select-grid" id="catSelectGrid"></div>
+    </div>
+
+    <div id="productListView" style="display:none;">
+      <button class="btn btn-sm" id="backToCatsBtn">← กลับไปเลือกหมวดหมู่</button>
+      <div class="product-grid" id="productGrid" style="margin-top:20px;"></div>
+    </div>
+  </section>
+
+  <!-- 4. ORDER SUMMARY -->
+  <section class="page" id="order">
+    <div class="section-head" style="margin-top:36px;">
+      <span class="num-badge">04</span>
+      <h2>สรุปคำสั่งซื้อ</h2>
+    </div>
+    <div class="order-layout">
+      <div>
+        <table class="cart-table">
+          <thead>
+            <tr><th>สินค้า</th><th>ราคา/ชิ้น</th><th>จำนวน</th><th>รวม</th><th></th></tr>
+          </thead>
+          <tbody id="cartBody"></tbody>
+        </table>
+      </div>
+      <div class="summary-card">
+        <h3>ยอดชำระ</h3>
+        <div class="sum-row"><span>ยอดรวมสินค้า</span><span id="sumSubtotal">0.-</span></div>
+        <div class="sum-row"><span>ค่าจัดส่งโดยประมาณ</span><span id="sumShip">เลือกในหน้าจัดส่ง</span></div>
+        <div class="sum-row total"><span>รวมทั้งสิ้น</span><span id="sumTotal">0.-</span></div>
+        <button class="btn" data-goto="shipping">ไปที่การจัดส่ง →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. SHIPPING -->
+  <section class="page" id="shipping">
+    <div class="section-head" style="margin-top:36px;">
+      <span class="num-badge">05</span>
+      <h2>เลือกวิธีการจัดส่ง</h2>
+    </div>
+    <div class="ship-layout">
+      <div>
+        <div class="form-wrap" style="margin:0 0 20px; padding:24px;">
+          <h2 style="font-size:1.15rem;">ที่อยู่จัดส่ง</h2>
+          <div class="field">
+            <label for="addr">ที่อยู่ (บ้านเลขที่ / โรงเรียน / ตำบล / อำเภอ / จังหวัด)</label>
+            <textarea id="addr" rows="3" placeholder="เช่น โรงเรียนบ้านสวนดี เลขที่ 99 ต.สวนดี อ.เมือง จ.เชียงใหม่ 50000"></textarea>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="phone">เบอร์โทรศัพท์</label>
+              <input type="tel" id="phone" placeholder="08X-XXX-XXXX">
+            </div>
+            <div class="field">
+              <label for="zip">รหัสไปรษณีย์</label>
+              <input type="text" id="zip" placeholder="50000">
+            </div>
+          </div>
+        </div>
+
+        <h2 style="font-family:var(--display); font-weight:700; font-size:1.15rem;">วิธีจัดส่ง</h2>
+        <div class="ship-options" id="shipOptions"></div>
+
+        <div class="confirm-box" id="confirmBox">
+          <div class="ok-title">✓ ยืนยันคำสั่งซื้อเรียบร้อย</div>
+          <div id="confirmDetail"></div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <h3>สรุปยอดสุทธิ</h3>
+        <div class="sum-row"><span>ยอดสินค้า</span><span id="ship_subtotal">0.-</span></div>
+        <div class="sum-row"><span>ค่าจัดส่ง</span><span id="ship_fee">— บาท</span></div>
+        <div class="sum-row"><span>ระยะเวลาจัดส่ง</span><span id="ship_eta">—</span></div>
+        <div class="sum-row total"><span>ยอดชำระทั้งหมด</span><span id="ship_total">0.-</span></div>
+        <button class="btn" id="confirmOrderBtn">ยืนยันคำสั่งซื้อ</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>p_patiphon — โปรเจกต์เว็บไซต์ตัวอย่างสำหรับนักเรียน · ทำด้วย HTML / CSS / JavaScript ล้วน</footer>
+
+<script>
+  // ---------- DATA ----------
+  const categories = [
+    {id:'stationery', name:'เครื่องเขียน', icon:'✏️'},
+    {id:'books', name:'หนังสือ & ตำรา', icon:'📚'},
+    {id:'uniform', name:'เครื่องแบบ', icon:'👕'},
+    {id:'snacks', name:'ของกิน & เครื่องดื่ม', icon:'🍪'},
+    {id:'tech', name:'อุปกรณ์ไอที', icon:'🎧'},
+  ];
+
+  const products = [
+    {id:1, cat:'stationery', name:'ปากกาลูกลื่น (แพ็ค 3)', price:35, icon:'🖊️'},
+    {id:2, cat:'stationery', name:'ดินสอไม้ 2B (แพ็ค 5)', price:30, icon:'✏️'},
+    {id:3, cat:'stationery', name:'สมุดโน้ตปกแข็ง A5', price:45, icon:'📓'},
+    {id:4, cat:'stationery', name:'ยางลบ + ไม้บรรทัด 30 ซม.', price:20, icon:'📏'},
+    {id:5, cat:'books', name:'แบบฝึกหัดคณิตศาสตร์ ม.ต้น', price:120, icon:'📗'},
+    {id:6, cat:'books', name:'หนังสือแบบฝึกหัดภาษาอังกฤษ', price:110, icon:'📘'},
+    {id:7, cat:'books', name:'สมุดแบบฝึกหัดวิทยาศาสตร์', price:65, icon:'📒'},
+    {id:8, cat:'uniform', name:'เสื้อนักเรียนชาย ไซส์ M', price:180, icon:'👔'},
+    {id:9, cat:'uniform', name:'เสื้อนักเรียนหญิง ไซส์ M', price:190, icon:'👚'},
+    {id:10, cat:'uniform', name:'กางเกงนักเรียน สีกรมท่า', price:220, icon:'👖'},
+    {id:11, cat:'uniform', name:'ถุงเท้านักเรียน (คู่)', price:35, icon:'🧦'},
+    {id:12, cat:'snacks', name:'ขนมปังแซนวิช', price:25, icon:'🥪'},
+    {id:13, cat:'snacks', name:'น้ำผลไม้กล่อง', price:15, icon:'🧃'},
+    {id:14, cat:'snacks', name:'คุกกี้ช็อกโกแลตชิพ', price:20, icon:'🍪'},
+    {id:15, cat:'tech', name:'หูฟังแบบมีสาย', price:150, icon:'🎧'},
+    {id:16, cat:'tech', name:'เมาส์ไร้สาย', price:190, icon:'🖱️'},
+    {id:17, cat:'tech', name:'แฟลชไดรฟ์ 32GB', price:160, icon:'💾'},
+  ];
+
+  const shippingMethods = [
+    {id:'rider', name:'ส่งด่วนถึงบ้าน (Rider)', desc:'จัดส่งภายในวันเดียว เหมาะกับของด่วน', price:40, eta:'ภายในวันนี้'},
+    {id:'post', name:'ไปรษณีย์ไทย (EMS)', desc:'จัดส่งมาตรฐาน เหมาะกับของทั่วไป', price:25, eta:'2–3 วันทำการ'},
+    {id:'school', name:'รับที่โรงเรียน', desc:'มารับเองที่จุดรับพัสดุในโรงเรียน ไม่มีค่าใช้จ่าย', price:0, eta:'1–2 วันทำการ'},
+  ];
+
+  // ---------- STATE ----------
+  let cart = {}; // {productId: qty}
+  let selectedShip = null;
+  let currentFilter = 'all';
+
+  // ---------- NAV ----------
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goTo(pageId){
+    pages.forEach(p => p.classList.toggle('active', p.id === pageId));
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+    window.scrollTo({top:0, behavior:'smooth'});
+    if(pageId === 'products') showCategoryView();
+    if(pageId === 'order') renderCart();
+    if(pageId === 'shipping') renderShipping();
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => goTo(b.dataset.page)));
+  document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => goTo(b.dataset.goto)));
+
+  // ---------- RENDER: HOME CATEGORIES ----------
+  const homeCats = document.getElementById('homeCats');
+  categories.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'sticker-cat';
+    el.innerHTML = `<span class="ic">${c.icon}</span><span>${c.name}</span>`;
+    el.addEventListener('click', () => { goTo('products'); showCategoryProducts(c.id); });
+    homeCats.appendChild(el);
+  });
+
+  // ---------- RENDER: FEATURED ----------
+  const featuredGrid = document.getElementById('featuredGrid');
+  const featuredIds = [3, 9, 1, 16];
+  featuredIds.forEach(id => featuredGrid.appendChild(productCard(products.find(p => p.id === id))));
+
+  // ---------- PRODUCT CARD BUILDER ----------
+  function productCard(p){
+    const cat = categories.find(c => c.id === p.cat);
+    const el = document.createElement('div');
+    el.className = 'product';
+    el.innerHTML = `
+      <div class="ic">${p.icon}</div>
+      <div class="tag">${cat.name}</div>
+      <div class="nm">${p.name}</div>
+      <div class="price-row">
+        <span class="price">${p.price}.-</span>
+        <button class="add-btn" data-id="${p.id}">+ ใส่ตะกร้า</button>
+      </div>
+    `;
+    el.querySelector('.add-btn').addEventListener('click', (e) => {
+      addToCart(p.id);
+      e.target.textContent = 'เพิ่มแล้ว ✓';
+      e.target.classList.add('added');
+      setTimeout(() => { e.target.textContent = '+ ใส่ตะกร้า'; e.target.classList.remove('added'); }, 900);
+    });
+    return el;
+  }
+
+  // ---------- PRODUCTS PAGE: category-first navigation ----------
+  const catSelectGrid = document.getElementById('catSelectGrid');
+  const categoryView = document.getElementById('categoryView');
+  const productListView = document.getElementById('productListView');
+  const productsHeading = document.getElementById('productsHeading');
+  const productGrid = document.getElementById('productGrid');
+
+  function renderCategorySelect(){
+    catSelectGrid.innerHTML = '';
+    categories.forEach(c => {
+      const count = products.filter(p => p.cat === c.id).length;
+      const el = document.createElement('div');
+      el.className = 'cat-select-card';
+      el.innerHTML = `<span class="ic">${c.icon}</span><span class="nm">${c.name}</span><span class="cnt">${count} รายการ</span>`;
+      el.addEventListener('click', () => showCategoryProducts(c.id));
+      catSelectGrid.appendChild(el);
+    });
+    const allEl = document.createElement('div');
+    allEl.className = 'cat-select-card all-card';
+    allEl.innerHTML = `<span class="ic">🗂️</span><span class="nm">สินค้าทั้งหมด</span><span class="cnt">${products.length} รายการ</span>`;
+    allEl.addEventListener('click', () => showCategoryProducts('all'));
+    catSelectGrid.appendChild(allEl);
+  }
+
+  function showCategoryView(){
+    currentFilter = 'all';
+    productsHeading.textContent = 'เลือกหมวดหมู่ที่ต้องการดูสินค้า';
+    categoryView.style.display = '';
+    productListView.style.display = 'none';
+  }
+
+  function showCategoryProducts(catId){
+    currentFilter = catId;
+    const cat = categories.find(c => c.id === catId);
+    productsHeading.textContent = cat ? `หมวดหมู่: ${cat.icon} ${cat.name}` : 'สินค้าทั้งหมด';
+    categoryView.style.display = 'none';
+    productListView.style.display = '';
+    renderProducts();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function renderProducts(){
+    productGrid.innerHTML = '';
+    const list = currentFilter === 'all' ? products : products.filter(p => p.cat === currentFilter);
+    list.forEach(p => productGrid.appendChild(productCard(p)));
+  }
+
+  document.getElementById('backToCatsBtn').addEventListener('click', showCategoryView);
+  renderCategorySelect();
+
+  // ---------- CART LOGIC ----------
+  function addToCart(id){
+    cart[id] = (cart[id] || 0) + 1;
+    updateCartBadge();
+  }
+  function changeQty(id, delta){
+    cart[id] = (cart[id] || 0) + delta;
+    if(cart[id] <= 0) delete cart[id];
+    updateCartBadge();
+    renderCart();
+  }
+  function removeFromCart(id){
+    delete cart[id];
+    updateCartBadge();
+    renderCart();
+  }
+  function cartCount(){ return Object.values(cart).reduce((a,b) => a+b, 0); }
+  function cartSubtotal(){
+    return Object.entries(cart).reduce((sum, [id, qty]) => {
+      const p = products.find(pr => pr.id === Number(id));
+      return sum + (p ? p.price * qty : 0);
+    }, 0);
+  }
+  function updateCartBadge(){
+    document.getElementById('cartBadge').textContent = cartCount();
+  }
+
+  const cartBody = document.getElementById('cartBody');
+  function renderCart(){
+    cartBody.innerHTML = '';
+    const entries = Object.entries(cart);
+    if(entries.length === 0){
+      cartBody.innerHTML = `<tr><td colspan="5"><div class="empty-cart">ตะกร้ายังว่างอยู่ — ลองไปเลือกซื้อสินค้ากันเลย 🛒</div></td></tr>`;
+    } else {
+      entries.forEach(([id, qty]) => {
+        const p = products.find(pr => pr.id === Number(id));
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><div class="cart-item-name"><span class="ic">${p.icon}</span>${p.name}</div></td>
+          <td style="font-family:var(--mono);">${p.price}.-</td>
+          <td>
+            <div class="qty-ctrl">
+              <button aria-label="ลดจำนวน" data-act="minus" data-id="${p.id}">−</button>
+              <span>${qty}</span>
+              <button aria-label="เพิ่มจำนวน" data-act="plus" data-id="${p.id}">+</button>
+            </div>
+          </td>
+          <td style="font-family:var(--mono); font-weight:800;">${p.price * qty}.-</td>
+          <td><button class="remove-link" data-id="${p.id}">ลบ</button></td>
+        `;
+        cartBody.appendChild(tr);
+      });
+    }
+    cartBody.querySelectorAll('[data-act="plus"]').forEach(b => b.addEventListener('click', () => changeQty(Number(b.dataset.id), 1)));
+    cartBody.querySelectorAll('[data-act="minus"]').forEach(b => b.addEventListener('click', () => changeQty(Number(b.dataset.id), -1)));
+    cartBody.querySelectorAll('.remove-link').forEach(b => b.addEventListener('click', () => removeFromCart(Number(b.dataset.id))));
+
+    const sub = cartSubtotal();
+    document.getElementById('sumSubtotal').textContent = sub + '.-';
+    const shipFee = selectedShip ? shippingMethods.find(s => s.id === selectedShip).price : 0;
+    document.getElementById('sumShip').textContent = selectedShip ? shipFee + '.-' : 'เลือกในหน้าจัดส่ง';
+    document.getElementById('sumTotal').textContent = (sub + shipFee) + '.-';
+  }
+
+  // ---------- SHIPPING PAGE ----------
+  const shipOptionsEl = document.getElementById('shipOptions');
+  function renderShipOptions(){
+    shipOptionsEl.innerHTML = '';
+    shippingMethods.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'ship-option' + (selectedShip === s.id ? ' selected' : '');
+      el.innerHTML = `
+        <div class="left">
+          <div class="radio-dot"></div>
+          <div>
+            <div class="nm">${s.name}</div>
+            <div class="desc">${s.desc}</div>
+          </div>
+        </div>
+        <div class="price">${s.price === 0 ? 'ฟรี' : s.price + '.-'}</div>
+      `;
+      el.addEventListener('click', () => { selectedShip = s.id; renderShipping(); });
+      shipOptionsEl.appendChild(el);
+    });
+  }
+  function renderShipping(){
+    renderShipOptions();
+    const sub = cartSubtotal();
+    document.getElementById('ship_subtotal').textContent = sub + '.-';
+    if(selectedShip){
+      const s = shippingMethods.find(x => x.id === selectedShip);
+      document.getElementById('ship_fee').textContent = (s.price === 0 ? 'ฟรี' : s.price + ' บาท');
+      document.getElementById('ship_eta').textContent = s.eta;
+      document.getElementById('ship_total').textContent = (sub + s.price) + '.-';
+    } else {
+      document.getElementById('ship_fee').textContent = '— บาท';
+      document.getElementById('ship_eta').textContent = '—';
+      document.getElementById('ship_total').textContent = sub + '.-';
+    }
+  }
+  document.getElementById('confirmOrderBtn').addEventListener('click', () => {
+    if(cartCount() === 0){ alert('ตะกร้าของคุณยังว่างอยู่ กรุณาเลือกสินค้าก่อนยืนยันคำสั่งซื้อ'); return; }
+    if(!selectedShip){ alert('กรุณาเลือกวิธีจัดส่งก่อนยืนยันคำสั่งซื้อ'); return; }
+    const s = shippingMethods.find(x => x.id === selectedShip);
+    const sub = cartSubtotal();
+    const box = document.getElementById('confirmBox');
+    box.classList.add('show');
+    document.getElementById('confirmDetail').innerHTML = `
+      หมายเลขคำสั่งซื้อ: DM-${Math.floor(1000+Math.random()*9000)}<br>
+      วิธีจัดส่ง: ${s.name} (${s.eta})<br>
+      ยอดชำระทั้งหมด: ${sub + s.price}.- บาท
+    `;
+    box.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+
+  // ---------- REGISTER FORM ----------
+  const registerForm = document.getElementById('registerForm');
+  registerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const pw1 = document.getElementById('pw1').value;
+    const pw2 = document.getElementById('pw2').value;
+    const pwHint = document.getElementById('pwHint');
+    if(pw1 !== pw2){
+      pwHint.textContent = '⚠ รหัสผ่านทั้งสองช่องไม่ตรงกัน';
+      pwHint.style.color = 'var(--pink)';
+      return;
+    }
+    pwHint.textContent = '';
+    const fname = document.getElementById('fname').value;
+    const lname = document.getElementById('lname').value;
+    document.getElementById('regSuccess').classList.add('show');
+    const pill = document.getElementById('memberPill');
+    document.getElementById('memberName').textContent = `${fname} ${lname}`;
+    pill.classList.add('show');
+    registerForm.reset();
+  });
+
+  // init
+  updateCartBadge();
+</script>
+</body>
+</html>
